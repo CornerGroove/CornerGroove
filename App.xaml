@@ -1,0 +1,171 @@
+<Application x:Class="MusicWidget.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <!-- Default Dark Theme Brushes -->
+        <SolidColorBrush x:Key="BgBrush" Color="#0C0C0E" />
+        <SolidColorBrush x:Key="CardBgBrush" Color="#131317" />
+        <SolidColorBrush x:Key="BorderBrush" Color="#26262E" />
+        <SolidColorBrush x:Key="SurfaceBrush" Color="#1C1C22" />
+        <SolidColorBrush x:Key="SurfaceHoverBrush" Color="#26262E" />
+        <SolidColorBrush x:Key="AccentBrush" Color="#10B981" />
+        <SolidColorBrush x:Key="AccentHoverBrush" Color="#059669" />
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#EDEDED" />
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#9E9EA8" />
+        <SolidColorBrush x:Key="TextMutedBrush" Color="#666672" />
+        <SolidColorBrush x:Key="TrackBgBrush" Color="#22222A" />
+        <SolidColorBrush x:Key="PlayBtnNormalBrush" Color="#EDEDED" />
+        <SolidColorBrush x:Key="PlayBtnHoverBrush" Color="#D4D4D8" />
+        <SolidColorBrush x:Key="PlayBtnIconBrush" Color="#0C0C0E" />
+        <SolidColorBrush x:Key="EdgeHandleBrush" Color="#666672" />
+
+        <!-- Aura Radial Abstract Gradient Colors -->
+        <Color x:Key="AuraColor1">#A010B981</Color>
+        <Color x:Key="AuraColor2">#7006B6D4</Color>
+        <Color x:Key="AuraColor3">#406366F1</Color>
+
+        <!-- Clean Modern ContextMenu (Fixes WPF white gutter bar!) -->
+        <Style TargetType="ContextMenu">
+            <Setter Property="Background" Value="{DynamicResource CardBgBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="HasDropShadow" Value="False" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContextMenu">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10"
+                                Padding="4">
+                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Clean Modern MenuItem (Zero white gutter!) -->
+        <Style TargetType="MenuItem">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="MenuItem">
+                        <Border x:Name="itemBorder"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="10,6,12,6"
+                                Margin="1,1,1,1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="20" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Checkmark Icon for checkable items -->
+                                <Path x:Name="checkMark"
+                                      Grid.Column="0"
+                                      Width="10" Height="10"
+                                      Stretch="Uniform"
+                                      Fill="{DynamicResource AccentBrush}"
+                                      Data="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+                                      Visibility="Collapsed"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Left" />
+
+                                <ContentPresenter Grid.Column="1"
+                                                  ContentSource="Header"
+                                                  RecognizesAccessKey="True"
+                                                  VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="checkMark" Property="Visibility" Value="Visible" />
+                            </Trigger>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="itemBorder" Property="Background" Value="{DynamicResource SurfaceHoverBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.4" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Modern Separator -->
+        <Style TargetType="Separator">
+            <Setter Property="Background" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="Height" Value="1" />
+            <Setter Property="Margin" Value="4,4,4,4" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Separator">
+                        <Border Height="1" Background="{TemplateBinding Background}" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Modern iOS / Apple Toggle Switch Style for CheckBox -->
+        <Style x:Key="ModernToggleSwitchStyle" TargetType="CheckBox">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Grid Margin="0,5,0,5" Background="Transparent">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ContentPresenter Grid.Column="0"
+                                              VerticalAlignment="Center"
+                                              Content="{TemplateBinding Content}"
+                                              Margin="0,0,10,0" />
+
+                            <!-- Switch Track -->
+                            <Border x:Name="switchTrack"
+                                    Grid.Column="1"
+                                    Width="38" Height="22"
+                                    CornerRadius="11"
+                                    Background="{DynamicResource TrackBgBrush}"
+                                    BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="1"
+                                    VerticalAlignment="Center">
+                                <!-- Switch Thumb -->
+                                <Ellipse x:Name="switchThumb"
+                                         Width="16" Height="16"
+                                         Fill="#FFFFFF"
+                                         HorizontalAlignment="Left"
+                                         Margin="2,0,0,0"
+                                         VerticalAlignment="Center" />
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="switchTrack" Property="Background" Value="{DynamicResource AccentBrush}" />
+                                <Setter TargetName="switchTrack" Property="BorderBrush" Value="{DynamicResource AccentHoverBrush}" />
+                                <Setter TargetName="switchThumb" Property="HorizontalAlignment" Value="Right" />
+                                <Setter TargetName="switchThumb" Property="Margin" Value="0,0,2,0" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="switchTrack" Property="Opacity" Value="0.9" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Application.Resources>
+</Application>
