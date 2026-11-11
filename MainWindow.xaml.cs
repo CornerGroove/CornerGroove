@@ -39,6 +39,9 @@ public partial class MainWindow : Window
     private double _dpiX = 1.0;
     private double _dpiY = 1.0;
 
+    private const int HOTKEY_ID = 9002;
+    private IntPtr _hwnd = IntPtr.Zero;
+
     private Grid? _capturedAppSlider;
     private AppAudioSession? _capturedAppSession;
 
@@ -95,6 +98,12 @@ public partial class MainWindow : Window
 
     private async void Window_Loaded(object sender, RoutedEventArgs e)
     {
+        // Interop Handle & Hotkey Hook
+        var helper = new WindowInteropHelper(this);
+        _hwnd = helper.EnsureHandle();
+        var sourceHook = HwndSource.FromHwnd(_hwnd);
+        sourceHook?.AddHook(HwndHook);
+
         // Apply saved theme instantly on launch
         ThemeManager.ApplyTheme(_settingsService.Settings.Theme, smooth: false);
         HighlightActiveThemeChip(_settingsService.Settings.Theme);
@@ -102,6 +111,10 @@ public partial class MainWindow : Window
         // Apply saved pin state
         _isPinned = _settingsService.Settings.AlwaysOnTop;
         UpdatePinIcon();
+
+        // Register saved in-game toggle hotkey
+        RegisterGlobalHotkey(_settingsService.Settings.Hotkey);
+        HighlightActiveHotkeyChip(_settingsService.Settings.Hotkey);
 
         // Calculate DPI
         var source = PresentationSource.FromVisual(this);
@@ -436,6 +449,11 @@ public partial class MainWindow : Window
         {
             double fillWidth = level * MasterSliderContainer.ActualWidth;
             MasterSliderFill.Width = Math.Clamp(fillWidth, 0, MasterSliderContainer.ActualWidth);
+            if (MasterSliderThumb != null)
+            {
+                double thumbLeft = Math.Clamp(fillWidth - 5, 0, Math.Max(0, MasterSliderContainer.ActualWidth - 10));
+                MasterSliderThumb.Margin = new Thickness(thumbLeft, 0, 0, 0);
+            }
         }
 
         if (isMuted)
@@ -588,10 +606,8 @@ public partial class MainWindow : Window
                 PlaceholderIcon.Visibility = Visibility.Visible;
             }
 
-            // Source Dot color
-            SourceDot.Fill = track.IsPlaying
-                ? (SolidColorBrush)FindResource("AccentBrush")
-                : (SolidColorBrush)FindResource("TextMutedBrush");
+            // Source App text active highlight
+            TxtSourceApp.SetResourceReference(TextBlock.ForegroundProperty, track.IsPlaying ? "TextSecondaryBrush" : "TextMutedBrush");
 
             // Play / Pause Icon
             IconPlayPause.Data = Geometry.Parse(track.IsPlaying ? PAUSE_ICON_DATA : PLAY_ICON_DATA);
@@ -646,6 +662,12 @@ public partial class MainWindow : Window
         {
             double fillWidth = (percentage / 100.0) * ProgressBarContainer.ActualWidth;
             ProgressBarFill.Width = Math.Clamp(fillWidth, 0, ProgressBarContainer.ActualWidth);
+            if (ProgressBarThumb != null)
+            {
+                double thumbLeft = Math.Clamp(fillWidth - 4, 0, Math.Max(0, ProgressBarContainer.ActualWidth - 8));
+                ProgressBarThumb.Margin = new Thickness(thumbLeft, 0, 0, 0);
+                ProgressBarThumb.Visibility = fillWidth > 2 ? Visibility.Visible : Visibility.Collapsed;
+            }
         }
     }
 
@@ -741,6 +763,114 @@ public partial class MainWindow : Window
         AutoStartHelper.SetAutoStart(enable);
         _settingsService.Settings.StartWithWindows = enable;
         _settingsService.Save();
+    }
+
+    // ==================== IN-GAME OVERLAY HOTKEY ====================
+
+    private void BtnHotkey_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is string key)
+        {
+            _settingsService.Settings.Hotkey = key;
+            _settingsService.Save();
+            RegisterGlobalHotkey(key);
+            HighlightActiveHotkeyChip(key);
+        }
+    }
+
+    private void HighlightActiveHotkeyChip(string hotkey)
+    {
+        var activeBrush = (Brush)FindResource("AccentBrush");
+        var normalBrush = (Brush)FindResource("BorderBrush");
+
+        BtnHotkeyF8.BorderBrush = hotkey.Equals("F8", StringComparison.OrdinalIgnoreCase) ? activeBrush : normalBrush;
+        BtnHotkeyF9.BorderBrush = hotkey.Equals("F9", StringComparison.OrdinalIgnoreCase) ? activeBrush : normalBrush;
+        BtnHotkeyF10.BorderBrush = hotkey.Equals("F10", StringComparison.OrdinalIgnoreCase) ? activeBrush : normalBrush;
+        BtnHotkeyCtrlShiftM.BorderBrush = hotkey.Equals("Ctrl+Shift+M", StringComparison.OrdinalIgnoreCase) ? activeBrush : normalBrush;
+        BtnHotkeyNone.BorderBrush = (hotkey.Equals("None", StringComparison.OrdinalIgnoreCase) || hotkey.Equals("Off", StringComparison.OrdinalIgnoreCase)) ? activeBrush : normalBrush;
+    }
+
+    private void RegisterGlobalHotkey(string hotkey)
+    {
+        if (_hwnd == IntPtr.Zero) return;
+        try
+        {
+            NativeMethods.UnregisterHotKey(_hwnd, HOTKEY_ID);
+        }
+        catch { }
+
+        uint mod = NativeMethods.MOD_NONE;
+        uint vk = 0;
+
+        switch (hotkey.ToUpperInvariant())
+        {
+            case "F8":
+                vk = 0x77;
+                break;
+            case "F9":
+                vk = 0x78;
+                break;
+            case "F10":
+                vk = 0x79;
+                break;
+            case "CTRL+SHIFT+M":
+                mod = NativeMethods.MOD_CONTROL | NativeMethods.MOD_SHIFT;
+                vk = 0x4D;
+                break;
+            case "NONE":
+            case "OFF":
+            default:
+                return;
+        }
+
+        try
+        {
+            NativeMethods.RegisterHotKey(_hwnd, HOTKEY_ID, mod | NativeMethods.MOD_NOREPEAT, vk);
+        }
+        catch { }
+    }
+
+    private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        if (msg == NativeMethods.WM_HOTKEY && wParam.ToInt32() == HOTKEY_ID)
+        {
+            ToggleWidgetFromHotkey();
+            handled = true;
+        }
+        return IntPtr.Zero;
+    }
+
+    private void ToggleWidgetFromHotkey()
+    {
+        Dispatcher.Invoke(() =>
+        {
+            if (!_isShown)
+            {
+                // Force top-most over fullscreen / borderless games
+                NativeMethods.SetWindowPos(_hwnd, NativeMethods.HWND_TOPMOST, 0, 0, 0, 0,
+                    NativeMethods.SWP_NOMOVE | NativeMethods.SWP_NOSIZE | NativeMethods.SWP_SHOWWINDOW);
+
+                _isPinned = true;
+                UpdatePinIcon();
+                SlideIn();
+
+                // Bring CornerGroove to foreground so Windows unlocks mouse capture and reveals desktop cursor
+                NativeMethods.SetForegroundWindow(_hwnd);
+                Activate();
+                Focus();
+
+                // Snap cursor onto widget controls
+                int targetX = (int)(Left + (Width / 2));
+                int targetY = (int)(Top + Height - 50);
+                NativeMethods.SetCursorPos(targetX, targetY);
+            }
+            else
+            {
+                _isPinned = false;
+                UpdatePinIcon();
+                SlideOut();
+            }
+        });
     }
 
     private void BtnPin_Click(object sender, RoutedEventArgs e)
@@ -864,6 +994,10 @@ public partial class MainWindow : Window
 
     private void Window_Closing(object sender, CancelEventArgs e)
     {
+        if (_hwnd != IntPtr.Zero)
+        {
+            try { NativeMethods.UnregisterHotKey(_hwnd, HOTKEY_ID); } catch { }
+        }
         _cornerCheckTimer.Stop();
         _hideTimer.Stop();
         _volumeHideTimer.Stop();

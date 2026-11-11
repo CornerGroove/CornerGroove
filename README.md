@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>A minimalist, edge-docked vinyl music widget &amp; per-application volume mixer for Windows 10 &amp; 11</strong><br>
-  <em>Crafted with Apple and Vercel design aesthetics — Flat soft UI, smooth theme transitions, and left-edge blurred radial aura.</em>
+  <em>Flat soft UI, smooth theme transitions, in-game overlay hotkey, and left-edge blurred radial aura.</em>
 </p>
 
 <p align="center">
@@ -18,15 +18,15 @@
 
 ---
 
-Tucked discreetly into the bottom-right corner of your screen, **CornerGroove** stays hidden until you slide your cursor into the corner—smoothly gliding into view with your active music playback, spinning vinyl disc artwork, blurred radial aura glow, and a complete system per-app volume mixer.
+Tucked discreetly into the bottom-right corner of your screen, **CornerGroove** stays hidden until you slide your cursor into the corner or press the configurable in-game hotkey—smoothly gliding into view with your active music playback, spinning vinyl disc artwork, blurred radial aura glow, and a complete system per-app volume mixer.
 
 ---
 
-## 📦 Downloads (v1.0.0 Release)
+## 📦 Downloads (GitHub Releases)
 
-Grab the precompiled release directly from the repository:
-- **Direct Executable:** [`releases/v1.0.0/CornerGroove.exe`](releases/v1.0.0/CornerGroove.exe)
-- **Portable Zip Archive:** [`releases/v1.0.0/CornerGroove-v1.0.0-windows-x64.zip`](releases/v1.0.0/CornerGroove-v1.0.0-windows-x64.zip)
+Download precompiled standalone binaries from the [GitHub Releases](https://github.com/CornerGroove/CornerGroove/releases/latest) page:
+- **Direct Executable:** [`CornerGroove.exe`](https://github.com/CornerGroove/CornerGroove/releases/download/v1.0.0/CornerGroove.exe)
+- **Portable Zip Archive:** [`CornerGroove-v1.0.0-windows-x64.zip`](https://github.com/CornerGroove/CornerGroove/releases/download/v1.0.0/CornerGroove-v1.0.0-windows-x64.zip)
 
 ---
 
@@ -35,20 +35,32 @@ Grab the precompiled release directly from the repository:
 - **Abstract Radial Blurred Aura (Left Edge Glow)**:
   - Emanates from behind the spinning vinyl disc on the left side of the widget card.
   - Atmospheric dual-orb radial gradient that dynamically matches your active theme palette (Emerald, Cyan, Violet, Caramel).
-  - Cleanly clipped to the card's 14px rounded corners—no harsh boxes or overflow artifacts.
+  - Cleanly clipped to the card's rounded corners—no harsh boxes or overflow artifacts.
+
+- **In-Game Overlay Hotkey & Cursor Restore**:
+  - Global hotkey support (`F8`, `F9`, `F10`, `Ctrl+Shift+M`, or Off) configurable directly in Settings.
+  - Instantly summons CornerGroove on top of fullscreen or borderless games.
+  - Unlocks mouse cursor capture and places the cursor right onto widget controls so you never lose control in games.
+
+- **Custom-Styled Interactive Sliders**:
+  - Polished master and per-application volume sliders with rounded tracks and subtle indicator thumbs.
+  - Seekable music progress bar with real-time feedback and dynamic hover indicator.
+
+- **Clean Typography (Zero Artificial Badges)**:
+  - Source app information (Spotify, YouTube, Tidal, etc.) presented in clean typography alongside the sound wave visualizer.
 
 - **Smooth Animated Theme Transitions**:
-  - Silky 60fps color interpolation across all theme brushes and aura gradients.
-  - Zero abrupt color snapping when switching themes—everything glides effortlessly into the new colorway.
+  - 60fps color interpolation across all theme brushes and aura gradients.
+  - Zero abrupt color snapping when switching themes—everything glides into the new colorway.
 
 - **Corner Edge-Slide Trigger**:
   - Sits tucked against the right screen edge with a subtle 4px handle.
   - Hovering into the bottom-right screen corner or handle triggers a smooth cubic ease-out slide-in.
   - Auto-hides after 1.3 seconds when cursor leaves (unless pinned).
-  - `ShowActivated="False"` ensures it never steals focus from fullscreen games or active coding windows.
+  - `ShowActivated="False"` ensures it never steals focus from active work or game windows during mouse hovering.
 
 - **Vinyl Record & Sleeve Animation**:
-  - Displays the album jacket / artwork with rounded corners.
+  - Displays album artwork with rounded corners.
   - Half of the vinyl record sticks out with grooved tracks and center label.
   - **Spins in real-time** when playing (`IsPlaying`), and freezes smoothly in place when paused.
 
@@ -59,27 +71,24 @@ Grab the precompiled release directly from the repository:
 - **Per-Application Volume Mixer (WASAPI Core Audio)**:
   - Hover or click the **Volume icon (🔊)** to reveal the upper **Mixer Panel**.
   - **Master Volume Slider** with one-click Mute toggle.
-  - **App Mixer**: Lists only active audio-producing applications (e.g., Spotify, Chrome, Firefox, Discord, games) with their high-resolution icons, individual volume sliders, and mute toggles.
-  - No bloated background processes—only actual audio sessions!
+  - **App Mixer**: Lists active audio-producing applications (e.g., Spotify, Chrome, Firefox, Discord, games) with high-resolution icons, individual volume sliders, and mute toggles.
+  - Only actual audio sessions are listed—no background process clutter.
 
 - **"Open Last Played" Memory**:
-  - Remembers the last played song title, artist, and source application (Spotify, YouTube, Apple Music, etc.).
-  - When nothing is playing, displays an **"Open [App]"** button that immediately launches or focuses the app/service so you can resume listening in one click.
+  - Remembers the last played song title, artist, and source application.
+  - When nothing is playing, displays an **"Open [App]"** button that immediately launches or focuses the app so you can resume listening in one click.
 
 - **Theme Engine (4 Built-in Themes)**:
-  - 🌙 **Dark** (Default Vercel & Apple deep obsidian `#0C0C0E` + Emerald `#10B981`)
-  - ☀️ **Light** (Clean Apple crisp silver `#F4F4F6` + Teal `#0D9488`)
+  - 🌙 **Dark** (Deep obsidian `#0C0C0E` + Emerald `#10B981`)
+  - ☀️ **Light** (Crisp silver `#F4F4F6` + Teal `#0D9488`)
   - 🧛 **Dracula** (Iconic `#282A36` + Purple `#BD93F9` & Green `#50FA7B`)
-  - ☕ **Cappuccino** (Warm cozy espresso & caramel tones `#2A231F` + `#D4A373`)
+  - ☕ **Cappuccino** (Warm espresso & caramel tones `#2A231F` + `#D4A373`)
 
-- **Integrated Settings View with iOS-Style Switches**:
-  - Click the **Gear (⚙)** icon to open the settings view directly in the upper card.
-  - Clean brand header with official CornerGroove logo and version badge.
-  - **iOS-style tactile toggle switches** for "Always on Top" and "Start with Windows".
+- **Tactile Toggle Switches**:
+  - Clean switches for "Always on Top" and "Start with Windows".
 
 - **Clean Custom Context Menu**:
-  - Custom styled WPF tray context menu—zero white icon gutters!
-  - Minimalist rounded card design matching your active theme.
+  - Custom styled WPF tray context menu with zero white icon gutters.
 
 - **Universal Media Capture (Windows SMTC)**:
   - Native integration with `GlobalSystemMediaTransportControlsSessionManager`:
@@ -102,12 +111,6 @@ Grab the precompiled release directly from the repository:
 
 ## 🚀 Getting Started
 
-### Run Precompiled Release
-Simply run:
-```powershell
-.\releases\v1.0.0\CornerGroove.exe
-```
-
 ### Build from Source
 Requirements: [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) on Windows 10/11.
 
@@ -122,10 +125,11 @@ dotnet run -c Release
 
 ## ⌨️ Shortcuts & Controls
 
+- **F8 (or custom hotkey)**: Toggles widget & unlocks/positions mouse cursor over widget in fullscreen games.
 - **Hover bottom-right screen edge**: Slides widget into view.
 - **Pin Icon (📌)**: Keeps widget permanently visible on top of all windows.
-- **Volume Icon (🔊)**: Toggles the master and per-application volume mixer panel.
-- **Gear Icon (⚙)**: Opens Settings & Theme selector with iOS toggle switches.
+- **Volume Icon (🔊)**: Toggles master and per-application volume mixer panel.
+- **Gear Icon (⚙)**: Opens Settings, Theme selector, and In-Game Hotkey config.
 - **Click progress bar**: Seeks forward or backward in the track.
 - **System Tray Icon**: Right-click for context menu; left-click to toggle widget.
 

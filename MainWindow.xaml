@@ -280,23 +280,34 @@
                                 <!-- Master Volume Interactive Track -->
                                 <Grid Grid.Column="1"
                                       x:Name="MasterSliderContainer"
-                                      Height="16"
+                                      Height="18"
                                       Margin="6,0,0,0"
                                       Background="Transparent"
                                       Cursor="Hand"
                                       MouseDown="MasterSlider_MouseDown"
                                       MouseMove="MasterSlider_MouseMove">
-                                    <Border Height="5"
+                                    <Border Height="6"
                                             Background="{DynamicResource TrackBgBrush}"
-                                            CornerRadius="2.5"
+                                            BorderBrush="{DynamicResource BorderBrush}"
+                                            BorderThickness="0.5"
+                                            CornerRadius="3"
                                             VerticalAlignment="Center"/>
                                     <Border x:Name="MasterSliderFill"
-                                            Height="5"
+                                            Height="6"
                                             Background="{DynamicResource AccentBrush}"
-                                            CornerRadius="2.5"
+                                            CornerRadius="3"
                                             HorizontalAlignment="Left"
                                             VerticalAlignment="Center"
                                             Width="100"/>
+                                    <Ellipse x:Name="MasterSliderThumb"
+                                             Width="10" Height="10"
+                                             Fill="{DynamicResource PlayBtnNormalBrush}"
+                                             Stroke="{DynamicResource BorderBrush}"
+                                             StrokeThickness="1"
+                                             HorizontalAlignment="Left"
+                                             VerticalAlignment="Center"
+                                             Margin="95,0,0,0"
+                                             IsHitTestVisible="False"/>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -387,16 +398,26 @@
                                                       MouseDown="AppSlider_MouseDown"
                                                       MouseMove="AppSlider_MouseMove"
                                                       Tag="{Binding}">
-                                                    <Border Height="4"
+                                                    <Border Height="5"
                                                             Background="{DynamicResource TrackBgBrush}"
-                                                            CornerRadius="2"
+                                                            BorderBrush="{DynamicResource BorderBrush}"
+                                                            BorderThickness="0.5"
+                                                            CornerRadius="2.5"
                                                             VerticalAlignment="Center"/>
-                                                    <Border Height="4"
+                                                    <Border Height="5"
                                                             Background="{DynamicResource AccentBrush}"
-                                                            CornerRadius="2"
+                                                            CornerRadius="2.5"
                                                             HorizontalAlignment="Left"
                                                             VerticalAlignment="Center"
                                                             Width="{Binding VolumePercentWidth}"/>
+                                                    <Ellipse Width="9" Height="9"
+                                                             Fill="{DynamicResource PlayBtnNormalBrush}"
+                                                             Stroke="{DynamicResource BorderBrush}"
+                                                             StrokeThickness="0.5"
+                                                             HorizontalAlignment="Left"
+                                                             VerticalAlignment="Center"
+                                                             Margin="{Binding ThumbMargin}"
+                                                             IsHitTestVisible="False"/>
                                                 </Grid>
 
                                                 <!-- App Volume Percentage -->
@@ -452,32 +473,6 @@
                                       VerticalScrollBarVisibility="Auto"
                                       HorizontalScrollBarVisibility="Disabled">
                             <StackPanel>
-                                <!-- Brand Header with Logo -->
-                                <Border Background="{DynamicResource SurfaceBrush}"
-                                        BorderBrush="{DynamicResource BorderBrush}"
-                                        BorderThickness="1"
-                                        CornerRadius="8"
-                                        Padding="8,6,8,6"
-                                        Margin="0,0,0,10">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <Border Grid.Column="0" Width="26" Height="26" CornerRadius="6" ClipToBounds="True" Margin="0,0,8,0">
-                                            <Image Source="logo.png" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
-                                        </Border>
-                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                            <TextBlock Text="CornerGroove" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
-                                            <TextBlock Text="Vinyl Music Dock" FontSize="8.5" Foreground="{DynamicResource TextMutedBrush}" />
-                                        </StackPanel>
-                                        <Border Grid.Column="2" Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="5,2" VerticalAlignment="Center">
-                                            <TextBlock Text="v1.0.0" FontSize="8.5" FontWeight="Medium" Foreground="{DynamicResource AccentBrush}" />
-                                        </Border>
-                                    </Grid>
-                                </Border>
-
                                 <!-- Themes Section -->
                                 <TextBlock Text="THEME PALETTE"
                                            FontSize="8.5"
@@ -515,7 +510,7 @@
                                     </Button>
                                 </WrapPanel>
 
-                                <!-- Behavior Switches Section (iOS / Apple Style Toggle Switches) -->
+                                <!-- Behavior Switches Section -->
                                 <Border Height="1" Background="{DynamicResource BorderBrush}" Margin="0,0,0,6"/>
 
                                 <TextBlock Text="BEHAVIOR"
@@ -535,6 +530,37 @@
                                           Style="{StaticResource ModernToggleSwitchStyle}"
                                           Content="Start with Windows"
                                           Click="ChkStartWithWindows_Click"/>
+
+                                <!-- In-Game Overlay Hotkey Section -->
+                                <Border Height="1" Background="{DynamicResource BorderBrush}" Margin="0,6,0,6"/>
+
+                                <TextBlock Text="TOGGLE HOTKEY (IN-GAME OVERLAY)"
+                                           FontSize="8.5"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextMutedBrush}"
+                                           Margin="0,0,0,3"/>
+                                <TextBlock Text="Brings widget and cursor to top during fullscreen games"
+                                           FontSize="8"
+                                           Foreground="{DynamicResource TextMutedBrush}"
+                                           Margin="0,0,0,6"/>
+
+                                <WrapPanel Margin="0,0,0,4">
+                                    <Button x:Name="BtnHotkeyF8" Style="{StaticResource ThemeChipBtnStyle}" Click="BtnHotkey_Click" Tag="F8">
+                                        <TextBlock Text="F8 (Default)" FontSize="9.5" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                    </Button>
+                                    <Button x:Name="BtnHotkeyF9" Style="{StaticResource ThemeChipBtnStyle}" Click="BtnHotkey_Click" Tag="F9">
+                                        <TextBlock Text="F9" FontSize="9.5" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                    </Button>
+                                    <Button x:Name="BtnHotkeyF10" Style="{StaticResource ThemeChipBtnStyle}" Click="BtnHotkey_Click" Tag="F10">
+                                        <TextBlock Text="F10" FontSize="9.5" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                    </Button>
+                                    <Button x:Name="BtnHotkeyCtrlShiftM" Style="{StaticResource ThemeChipBtnStyle}" Click="BtnHotkey_Click" Tag="Ctrl+Shift+M">
+                                        <TextBlock Text="Ctrl+Shift+M" FontSize="9.5" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                    </Button>
+                                    <Button x:Name="BtnHotkeyNone" Style="{StaticResource ThemeChipBtnStyle}" Click="BtnHotkey_Click" Tag="None">
+                                        <TextBlock Text="Off" FontSize="9.5" Foreground="{DynamicResource TextMutedBrush}"/>
+                                    </Button>
+                                </WrapPanel>
                             </StackPanel>
                         </ScrollViewer>
                     </Grid>
@@ -604,33 +630,21 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
-                            <!-- Left: Source Badge + 3-Bar Sound Wave Animation -->
+                            <!-- Left: Source App & Wave Visualizer (Clean minimal typography, no badge box) -->
                             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                                <!-- Source Badge (e.g. Spotify / YouTube) -->
-                                <Border Background="{DynamicResource SurfaceBrush}"
-                                        BorderBrush="{DynamicResource BorderBrush}"
-                                        BorderThickness="1"
-                                        CornerRadius="4"
-                                        Padding="6,2,6,2">
-                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Ellipse x:Name="SourceDot" Width="5.5" Height="5.5"
-                                                 Fill="{DynamicResource AccentBrush}"
-                                                 Margin="0,0,5,0" VerticalAlignment="Center" />
-                                        <TextBlock x:Name="TxtSourceApp"
-                                                   Text="Spotify"
-                                                   FontSize="9.5"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                                   VerticalAlignment="Center" />
-                                    </StackPanel>
-                                </Border>
+                                <TextBlock x:Name="TxtSourceApp"
+                                           Text="Spotify"
+                                           FontSize="10"
+                                           FontWeight="Medium"
+                                           Foreground="{DynamicResource TextMutedBrush}"
+                                           VerticalAlignment="Center" />
 
                                 <!-- 3-Bar Audio Wave Animation -->
                                 <StackPanel x:Name="WaveContainer"
                                             Orientation="Horizontal"
                                             VerticalAlignment="Center"
-                                            Height="14"
-                                            Margin="7,0,0,0"
+                                            Height="12"
+                                            Margin="8,0,0,0"
                                             Opacity="0.4"
                                             ToolTip="Audio playback visualizer">
                                     <Border x:Name="WaveBar1" Width="2" Height="3"
@@ -885,26 +899,40 @@
                             <!-- Interactive Progress Bar -->
                             <Grid Grid.Column="1"
                                   x:Name="ProgressBarContainer"
-                                  Height="12"
+                                  Height="14"
                                   Margin="4,0,4,0"
                                   Background="Transparent"
                                   Cursor="Hand"
                                   MouseDown="ProgressBar_MouseDown">
 
                                 <!-- Background Track -->
-                                <Border Height="3"
+                                <Border Height="4"
                                         Background="{DynamicResource TrackBgBrush}"
-                                        CornerRadius="1.5"
+                                        BorderBrush="{DynamicResource BorderBrush}"
+                                        BorderThickness="0.5"
+                                        CornerRadius="2"
                                         VerticalAlignment="Center" />
 
                                 <!-- Active Progress Fill -->
                                 <Border x:Name="ProgressBarFill"
-                                        Height="3"
+                                        Height="4"
                                         Background="{DynamicResource AccentBrush}"
-                                        CornerRadius="1.5"
+                                        CornerRadius="2"
                                         HorizontalAlignment="Left"
                                         VerticalAlignment="Center"
                                         Width="0" />
+
+                                <!-- Subtle Thumb on Timeline -->
+                                <Ellipse x:Name="ProgressBarThumb"
+                                         Width="8" Height="8"
+                                         Fill="{DynamicResource PlayBtnNormalBrush}"
+                                         Stroke="{DynamicResource BorderBrush}"
+                                         StrokeThickness="0.5"
+                                         HorizontalAlignment="Left"
+                                         VerticalAlignment="Center"
+                                         Margin="-4,0,0,0"
+                                         IsHitTestVisible="False"
+                                         Visibility="Collapsed" />
                             </Grid>
 
                             <!-- Total Duration -->

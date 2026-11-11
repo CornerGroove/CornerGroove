@@ -30,5 +30,7 @@ Desktop.ini
 $RECYCLE.BIN/
 .DS_Store
 
-# Publish output
+# Output and release artifacts (transferred to real GitHub Releases)
 publish/
+dist/
+releases/

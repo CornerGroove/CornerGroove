@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Media;
 
 namespace MusicWidget.Models;
@@ -26,6 +27,7 @@ public class AppAudioSession : INotifyPropertyChanged
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(FormattedPercent));
                 OnPropertyChanged(nameof(VolumePercentWidth));
+                OnPropertyChanged(nameof(ThumbMargin));
             }
         }
     }
@@ -45,6 +47,7 @@ public class AppAudioSession : INotifyPropertyChanged
 
     public string FormattedPercent => IsMuted ? "Muted" : $"{(int)Math.Round(Volume * 100)}%";
     public double VolumePercentWidth => Volume * 100.0;
+    public Thickness ThumbMargin => new Thickness(Math.Max(0, VolumePercentWidth - 4.5), 0, 0, 0);
 
     public Action<AppAudioSession, float>? OnVolumeChanged { get; set; }
     public Action<AppAudioSession>? OnMuteToggled { get; set; }

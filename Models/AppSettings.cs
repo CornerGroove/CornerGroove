@@ -7,6 +7,7 @@ public class AppSettings
     public string Theme { get; set; } = "Dark";
     public bool AlwaysOnTop { get; set; } = false;
     public bool StartWithWindows { get; set; } = false;
+    public string Hotkey { get; set; } = "F8";
 
     public string LastPlayedTitle { get; set; } = string.Empty;
     public string LastPlayedArtist { get; set; } = string.Empty;
