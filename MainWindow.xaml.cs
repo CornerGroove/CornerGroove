@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Effects;
 using System.Windows.Threading;
 using MusicWidget.Helpers;
 using MusicWidget.Models;
@@ -41,9 +42,6 @@ public partial class MainWindow : Window
 
     private const int HOTKEY_ID = 9002;
     private IntPtr _hwnd = IntPtr.Zero;
-
-    private Grid? _capturedAppSlider;
-    private AppAudioSession? _capturedAppSession;
 
     private const string PLAY_ICON_DATA = "M8 5v14l11-7z";
     private const string PAUSE_ICON_DATA = "M6 19h4V5H6v14zm8-14v14h4V5h-4z";
@@ -158,9 +156,6 @@ public partial class MainWindow : Window
         // Position window in hidden state initially
         PositionWindow(hidden: true);
 
-        ProgressBarContainer.SizeChanged += (s, e) => UpdateProgressBar(_mediaService.CurrentTrack.ProgressPercentage);
-        MasterSliderContainer.SizeChanged += (s, e) => UpdateMasterVolumeUI(_volumeService.GetMasterVolume(), _volumeService.IsMasterMuted());
-
         // Initial Master Volume
         UpdateMasterVolumeUI(_volumeService.GetMasterVolume(), _volumeService.IsMasterMuted());
 
@@ -214,23 +209,47 @@ public partial class MainWindow : Window
         var workArea = SystemParameters.WorkArea;
         double targetLeft = workArea.Right - Width - 12;
 
-        var anim = new DoubleAnimation
+        // Slide animation
+        var animSlide = new DoubleAnimation
         {
             From = Left,
             To = targetLeft,
-            Duration = TimeSpan.FromMilliseconds(250),
+            Duration = TimeSpan.FromMilliseconds(260),
             EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
         };
 
-        anim.Completed += (s, e) =>
+        // Entrance blur animation: from 16 blur down to 0 (crisp sharp focus)
+        var blur = new BlurEffect { Radius = 16, RenderingBias = RenderingBias.Quality };
+        MainMusicCard.Effect = blur;
+
+        var animBlur = new DoubleAnimation
+        {
+            From = 16,
+            To = 0,
+            Duration = TimeSpan.FromMilliseconds(280),
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+        };
+
+        var animOpacity = new DoubleAnimation
+        {
+            From = 0.4,
+            To = 1.0,
+            Duration = TimeSpan.FromMilliseconds(240),
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+        };
+
+        animSlide.Completed += (s, e) =>
         {
             _isAnimating = false;
             _isShown = true;
             Left = targetLeft;
+            MainMusicCard.Effect = null;
         };
 
         Topmost = true;
-        BeginAnimation(LeftProperty, anim);
+        MainMusicCard.BeginAnimation(OpacityProperty, animOpacity);
+        blur.BeginAnimation(BlurEffect.RadiusProperty, animBlur);
+        BeginAnimation(LeftProperty, animSlide);
     }
 
     public void SlideOut()
@@ -243,22 +262,45 @@ public partial class MainWindow : Window
         var workArea = SystemParameters.WorkArea;
         double targetLeft = workArea.Right - 8;
 
-        var anim = new DoubleAnimation
+        var animSlide = new DoubleAnimation
         {
             From = Left,
             To = targetLeft,
-            Duration = TimeSpan.FromMilliseconds(230),
+            Duration = TimeSpan.FromMilliseconds(220),
             EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn }
         };
 
-        anim.Completed += (s, e) =>
+        var blur = new BlurEffect { Radius = 0, RenderingBias = RenderingBias.Quality };
+        MainMusicCard.Effect = blur;
+
+        var animBlur = new DoubleAnimation
+        {
+            From = 0,
+            To = 12,
+            Duration = TimeSpan.FromMilliseconds(220),
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn }
+        };
+
+        var animOpacity = new DoubleAnimation
+        {
+            From = 1.0,
+            To = 0.0,
+            Duration = TimeSpan.FromMilliseconds(200),
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn }
+        };
+
+        animSlide.Completed += (s, e) =>
         {
             _isAnimating = false;
             _isShown = false;
             Left = targetLeft;
+            MainMusicCard.Effect = null;
+            MainMusicCard.Opacity = 1.0;
         };
 
-        BeginAnimation(LeftProperty, anim);
+        MainMusicCard.BeginAnimation(OpacityProperty, animOpacity);
+        blur.BeginAnimation(BlurEffect.RadiusProperty, animBlur);
+        BeginAnimation(LeftProperty, animSlide);
     }
 
     private bool IsMouseOverWidget()
@@ -440,32 +482,35 @@ public partial class MainWindow : Window
 
     // ==================== MASTER VOLUME ====================
 
+    private bool _isUpdatingMasterVolumeUI = false;
+
     private void UpdateMasterVolumeUI(float level, bool isMuted)
     {
         int pct = (int)Math.Round(level * 100);
         TxtMasterVolumePercent.Text = isMuted ? "Muted" : $"{pct}%";
 
-        if (MasterSliderContainer.ActualWidth > 0)
+        if (MasterSlider != null)
         {
-            double fillWidth = level * MasterSliderContainer.ActualWidth;
-            MasterSliderFill.Width = Math.Clamp(fillWidth, 0, MasterSliderContainer.ActualWidth);
-            if (MasterSliderThumb != null)
-            {
-                double thumbLeft = Math.Clamp(fillWidth - 5, 0, Math.Max(0, MasterSliderContainer.ActualWidth - 10));
-                MasterSliderThumb.Margin = new Thickness(thumbLeft, 0, 0, 0);
-            }
+            _isUpdatingMasterVolumeUI = true;
+            MasterSlider.Value = level;
+            _isUpdatingMasterVolumeUI = false;
         }
 
         if (isMuted)
         {
             IconMasterSpeaker.Data = Geometry.Parse(MUTE_ICON_DATA);
-            MasterSliderFill.SetResourceReference(Border.BackgroundProperty, "TextMutedBrush");
         }
         else
         {
             IconMasterSpeaker.Data = Geometry.Parse(SPEAKER_ICON_DATA);
-            MasterSliderFill.SetResourceReference(Border.BackgroundProperty, "AccentBrush");
         }
+    }
+
+    private void MasterSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (_isUpdatingMasterVolumeUI) return;
+        _volumeService.SetMasterVolume((float)e.NewValue);
+        TxtMasterVolumePercent.Text = _volumeService.IsMasterMuted() ? "Muted" : $"{(int)Math.Round(e.NewValue * 100)}%";
     }
 
     private void BtnMasterMute_Click(object sender, RoutedEventArgs e)
@@ -473,83 +518,13 @@ public partial class MainWindow : Window
         _volumeService.ToggleMasterMute();
     }
 
-    private void MasterSlider_MouseDown(object sender, MouseButtonEventArgs e)
-    {
-        if (e.LeftButton == MouseButtonState.Pressed)
-        {
-            MasterSliderContainer.CaptureMouse();
-            UpdateMasterVolumeFromMouse(e);
-        }
-    }
-
-    private void MasterSlider_MouseMove(object sender, MouseEventArgs e)
-    {
-        if (MasterSliderContainer.IsMouseCaptured && e.LeftButton == MouseButtonState.Pressed)
-        {
-            UpdateMasterVolumeFromMouse(e);
-        }
-    }
-
-    private void UpdateMasterVolumeFromMouse(MouseEventArgs e)
-    {
-        if (MasterSliderContainer.ActualWidth <= 0) return;
-        var pos = e.GetPosition(MasterSliderContainer);
-        double pct = pos.X / MasterSliderContainer.ActualWidth;
-        pct = Math.Clamp(pct, 0.0, 1.0);
-        _volumeService.SetMasterVolume((float)pct);
-        UpdateMasterVolumeUI((float)pct, _volumeService.IsMasterMuted());
-    }
-
     // ==================== PER-APP VOLUME SLIDERS ====================
-
-    private void AppSlider_MouseDown(object sender, MouseButtonEventArgs e)
-    {
-        if (sender is Grid grid && grid.Tag is AppAudioSession session && e.LeftButton == MouseButtonState.Pressed)
-        {
-            _capturedAppSlider = grid;
-            _capturedAppSession = session;
-            grid.CaptureMouse();
-            UpdateAppVolumeFromMouse(grid, session, e);
-        }
-    }
-
-    private void AppSlider_MouseMove(object sender, MouseEventArgs e)
-    {
-        if (_capturedAppSlider != null && _capturedAppSession != null && _capturedAppSlider.IsMouseCaptured)
-        {
-            UpdateAppVolumeFromMouse(_capturedAppSlider, _capturedAppSession, e);
-        }
-    }
-
-    private void UpdateAppVolumeFromMouse(Grid grid, AppAudioSession session, MouseEventArgs e)
-    {
-        if (grid.ActualWidth <= 0) return;
-        var pos = e.GetPosition(grid);
-        double pct = pos.X / grid.ActualWidth;
-        pct = Math.Clamp(pct, 0.0, 1.0);
-        session.UpdateVolumeFromSlider((float)pct);
-    }
 
     private void AppMuteBtn_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button btn && btn.Tag is AppAudioSession session)
         {
             session.ToggleMute();
-        }
-    }
-
-    protected override void OnPreviewMouseUp(MouseButtonEventArgs e)
-    {
-        base.OnPreviewMouseUp(e);
-        if (MasterSliderContainer.IsMouseCaptured)
-        {
-            MasterSliderContainer.ReleaseMouseCapture();
-        }
-        if (_capturedAppSlider != null && _capturedAppSlider.IsMouseCaptured)
-        {
-            _capturedAppSlider.ReleaseMouseCapture();
-            _capturedAppSlider = null;
-            _capturedAppSession = null;
         }
     }
 
@@ -656,19 +631,32 @@ public partial class MainWindow : Window
         });
     }
 
+    private bool _isUserSeekingTimeline = false;
+
     private void UpdateProgressBar(double percentage)
     {
-        if (ProgressBarContainer.ActualWidth > 0)
+        if (!_isUserSeekingTimeline && TimelineSlider != null)
         {
-            double fillWidth = (percentage / 100.0) * ProgressBarContainer.ActualWidth;
-            ProgressBarFill.Width = Math.Clamp(fillWidth, 0, ProgressBarContainer.ActualWidth);
-            if (ProgressBarThumb != null)
-            {
-                double thumbLeft = Math.Clamp(fillWidth - 4, 0, Math.Max(0, ProgressBarContainer.ActualWidth - 8));
-                ProgressBarThumb.Margin = new Thickness(thumbLeft, 0, 0, 0);
-                ProgressBarThumb.Visibility = fillWidth > 2 ? Visibility.Visible : Visibility.Collapsed;
-            }
+            TimelineSlider.Value = Math.Clamp(percentage, 0, 100);
         }
+    }
+
+    private void TimelineSlider_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        _isUserSeekingTimeline = true;
+    }
+
+    private async void TimelineSlider_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+    {
+        _isUserSeekingTimeline = false;
+        if (TimelineSlider != null)
+        {
+            await _mediaService.SeekToProgressAsync(TimelineSlider.Value);
+        }
+    }
+
+    private void TimelineSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
     }
 
     private void BtnOpenLastPlayed_Click(object sender, RoutedEventArgs e)
@@ -691,18 +679,6 @@ public partial class MainWindow : Window
         await _mediaService.NextAsync();
     }
 
-    private async void ProgressBar_MouseDown(object sender, MouseButtonEventArgs e)
-    {
-        if (ProgressBarContainer.ActualWidth <= 0) return;
-
-        var pos = e.GetPosition(ProgressBarContainer);
-        double pct = (pos.X / ProgressBarContainer.ActualWidth) * 100.0;
-        pct = Math.Clamp(pct, 0, 100);
-
-        UpdateProgressBar(pct);
-        await _mediaService.SeekToProgressAsync(pct);
-    }
-
     // ==================== THEMES & SWITCHES ====================
 
     private void BtnThemeDark_Click(object sender, RoutedEventArgs e) => ApplyTheme("Dark");
@@ -712,12 +688,28 @@ public partial class MainWindow : Window
 
     private void ApplyTheme(string themeName)
     {
-        ThemeManager.ApplyTheme(themeName, smooth: true);
-        _settingsService.Settings.Theme = themeName;
-        _settingsService.Save();
+        try
+        {
+            // Subtle, silky smooth theme transition crossfade
+            var animFade = new DoubleAnimation(0.75, 1.0, TimeSpan.FromMilliseconds(200))
+            {
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+            };
+            MainMusicCard.BeginAnimation(OpacityProperty, animFade);
+            VolumePopupCard.BeginAnimation(OpacityProperty, animFade);
 
-        HighlightActiveThemeChip(themeName);
-        UpdatePinIcon();
+            ThemeManager.ApplyTheme(themeName, smooth: true);
+            _settingsService.Settings.Theme = themeName;
+            _settingsService.Save();
+
+            HighlightActiveThemeChip(themeName);
+            UpdatePinIcon();
+            UpdateMasterVolumeUI(_volumeService.GetMasterVolume(), _volumeService.IsMasterMuted());
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"ApplyTheme error: {ex.Message}");
+        }
     }
 
     private void HighlightActiveThemeChip(string themeName)
@@ -733,20 +725,24 @@ public partial class MainWindow : Window
 
     private void OnAuraColorsChanged(Color c1, Color c2, Color c3, bool smooth)
     {
-        if (smooth)
+        try
         {
-            var duration = TimeSpan.FromMilliseconds(280);
-            var easing = new CubicEase { EasingMode = EasingMode.EaseOut };
-            AuraStop1?.BeginAnimation(GradientStop.ColorProperty, new ColorAnimation(c1, duration) { EasingFunction = easing });
-            AuraStop2?.BeginAnimation(GradientStop.ColorProperty, new ColorAnimation(c2, duration) { EasingFunction = easing });
-            AuraStop3?.BeginAnimation(GradientStop.ColorProperty, new ColorAnimation(c3, duration) { EasingFunction = easing });
+            if (smooth)
+            {
+                var duration = TimeSpan.FromMilliseconds(250);
+                var easing = new CubicEase { EasingMode = EasingMode.EaseOut };
+                AuraStop1?.BeginAnimation(GradientStop.ColorProperty, new ColorAnimation(c1, duration) { EasingFunction = easing });
+                AuraStop2?.BeginAnimation(GradientStop.ColorProperty, new ColorAnimation(c2, duration) { EasingFunction = easing });
+                AuraStop3?.BeginAnimation(GradientStop.ColorProperty, new ColorAnimation(c3, duration) { EasingFunction = easing });
+            }
+            else
+            {
+                if (AuraStop1 != null) { AuraStop1.BeginAnimation(GradientStop.ColorProperty, null); AuraStop1.Color = c1; }
+                if (AuraStop2 != null) { AuraStop2.BeginAnimation(GradientStop.ColorProperty, null); AuraStop2.Color = c2; }
+                if (AuraStop3 != null) { AuraStop3.BeginAnimation(GradientStop.ColorProperty, null); AuraStop3.Color = c3; }
+            }
         }
-        else
-        {
-            if (AuraStop1 != null) { AuraStop1.BeginAnimation(GradientStop.ColorProperty, null); AuraStop1.Color = c1; }
-            if (AuraStop2 != null) { AuraStop2.BeginAnimation(GradientStop.ColorProperty, null); AuraStop2.Color = c2; }
-            if (AuraStop3 != null) { AuraStop3.BeginAnimation(GradientStop.ColorProperty, null); AuraStop3.Color = c3; }
-        }
+        catch { }
     }
 
     private void ChkAlwaysOnTop_Click(object sender, RoutedEventArgs e)

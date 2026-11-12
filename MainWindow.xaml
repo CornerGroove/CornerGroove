@@ -277,38 +277,14 @@
                                           Data="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
                                 </Button>
 
-                                <!-- Master Volume Interactive Track -->
-                                <Grid Grid.Column="1"
-                                      x:Name="MasterSliderContainer"
-                                      Height="18"
-                                      Margin="6,0,0,0"
-                                      Background="Transparent"
-                                      Cursor="Hand"
-                                      MouseDown="MasterSlider_MouseDown"
-                                      MouseMove="MasterSlider_MouseMove">
-                                    <Border Height="6"
-                                            Background="{DynamicResource TrackBgBrush}"
-                                            BorderBrush="{DynamicResource BorderBrush}"
-                                            BorderThickness="0.5"
-                                            CornerRadius="3"
-                                            VerticalAlignment="Center"/>
-                                    <Border x:Name="MasterSliderFill"
-                                            Height="6"
-                                            Background="{DynamicResource AccentBrush}"
-                                            CornerRadius="3"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Center"
-                                            Width="100"/>
-                                    <Ellipse x:Name="MasterSliderThumb"
-                                             Width="10" Height="10"
-                                             Fill="{DynamicResource PlayBtnNormalBrush}"
-                                             Stroke="{DynamicResource BorderBrush}"
-                                             StrokeThickness="1"
-                                             HorizontalAlignment="Left"
-                                             VerticalAlignment="Center"
-                                             Margin="95,0,0,0"
-                                             IsHitTestVisible="False"/>
-                                </Grid>
+                                <!-- Master Volume Interactive Slider -->
+                                <Slider x:Name="MasterSlider"
+                                        Grid.Column="1"
+                                        Margin="6,0,0,0"
+                                        Minimum="0" Maximum="1"
+                                        SmallChange="0.01" LargeChange="0.05"
+                                        Style="{StaticResource ModernSliderStyle}"
+                                        ValueChanged="MasterSlider_ValueChanged" />
                             </Grid>
                         </Grid>
 
@@ -389,36 +365,13 @@
                                                           Data="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
                                                 </Button>
 
-                                                <!-- App Volume Interactive Track -->
-                                                <Grid Grid.Column="3"
-                                                      Height="16"
-                                                      Margin="4,0,4,0"
-                                                      Background="Transparent"
-                                                      Cursor="Hand"
-                                                      MouseDown="AppSlider_MouseDown"
-                                                      MouseMove="AppSlider_MouseMove"
-                                                      Tag="{Binding}">
-                                                    <Border Height="5"
-                                                            Background="{DynamicResource TrackBgBrush}"
-                                                            BorderBrush="{DynamicResource BorderBrush}"
-                                                            BorderThickness="0.5"
-                                                            CornerRadius="2.5"
-                                                            VerticalAlignment="Center"/>
-                                                    <Border Height="5"
-                                                            Background="{DynamicResource AccentBrush}"
-                                                            CornerRadius="2.5"
-                                                            HorizontalAlignment="Left"
-                                                            VerticalAlignment="Center"
-                                                            Width="{Binding VolumePercentWidth}"/>
-                                                    <Ellipse Width="9" Height="9"
-                                                             Fill="{DynamicResource PlayBtnNormalBrush}"
-                                                             Stroke="{DynamicResource BorderBrush}"
-                                                             StrokeThickness="0.5"
-                                                             HorizontalAlignment="Left"
-                                                             VerticalAlignment="Center"
-                                                             Margin="{Binding ThumbMargin}"
-                                                             IsHitTestVisible="False"/>
-                                                </Grid>
+                                                <!-- App Volume Interactive Slider -->
+                                                <Slider Grid.Column="3"
+                                                        Margin="4,0,4,0"
+                                                        Minimum="0" Maximum="1"
+                                                        SmallChange="0.01" LargeChange="0.05"
+                                                        Value="{Binding Volume, Mode=TwoWay}"
+                                                        Style="{StaticResource ModernSliderStyle}" />
 
                                                 <!-- App Volume Percentage -->
                                                 <TextBlock Grid.Column="4"
@@ -896,44 +849,15 @@
                                        VerticalAlignment="Center"
                                        HorizontalAlignment="Left" />
 
-                            <!-- Interactive Progress Bar -->
-                            <Grid Grid.Column="1"
-                                  x:Name="ProgressBarContainer"
-                                  Height="14"
-                                  Margin="4,0,4,0"
-                                  Background="Transparent"
-                                  Cursor="Hand"
-                                  MouseDown="ProgressBar_MouseDown">
-
-                                <!-- Background Track -->
-                                <Border Height="4"
-                                        Background="{DynamicResource TrackBgBrush}"
-                                        BorderBrush="{DynamicResource BorderBrush}"
-                                        BorderThickness="0.5"
-                                        CornerRadius="2"
-                                        VerticalAlignment="Center" />
-
-                                <!-- Active Progress Fill -->
-                                <Border x:Name="ProgressBarFill"
-                                        Height="4"
-                                        Background="{DynamicResource AccentBrush}"
-                                        CornerRadius="2"
-                                        HorizontalAlignment="Left"
-                                        VerticalAlignment="Center"
-                                        Width="0" />
-
-                                <!-- Subtle Thumb on Timeline -->
-                                <Ellipse x:Name="ProgressBarThumb"
-                                         Width="8" Height="8"
-                                         Fill="{DynamicResource PlayBtnNormalBrush}"
-                                         Stroke="{DynamicResource BorderBrush}"
-                                         StrokeThickness="0.5"
-                                         HorizontalAlignment="Left"
-                                         VerticalAlignment="Center"
-                                         Margin="-4,0,0,0"
-                                         IsHitTestVisible="False"
-                                         Visibility="Collapsed" />
-                            </Grid>
+                            <!-- Interactive Progress Timeline Slider -->
+                            <Slider x:Name="TimelineSlider"
+                                    Grid.Column="1"
+                                    Margin="4,0,4,0"
+                                    Minimum="0" Maximum="100"
+                                    Style="{StaticResource ModernTimelineSliderStyle}"
+                                    PreviewMouseDown="TimelineSlider_PreviewMouseDown"
+                                    PreviewMouseUp="TimelineSlider_PreviewMouseUp"
+                                    ValueChanged="TimelineSlider_ValueChanged" />
 
                             <!-- Total Duration -->
                             <TextBlock x:Name="TxtDuration"

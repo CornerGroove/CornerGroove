@@ -28,6 +28,7 @@ public class AppAudioSession : INotifyPropertyChanged
                 OnPropertyChanged(nameof(FormattedPercent));
                 OnPropertyChanged(nameof(VolumePercentWidth));
                 OnPropertyChanged(nameof(ThumbMargin));
+                OnVolumeChanged?.Invoke(this, _volume);
             }
         }
     }
@@ -41,6 +42,7 @@ public class AppAudioSession : INotifyPropertyChanged
             {
                 _isMuted = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(FormattedPercent));
             }
         }
     }
@@ -55,7 +57,6 @@ public class AppAudioSession : INotifyPropertyChanged
     public void UpdateVolumeFromSlider(float newVolume)
     {
         Volume = newVolume;
-        OnVolumeChanged?.Invoke(this, newVolume);
     }
 
     public void ToggleMute()

@@ -25,7 +25,7 @@
         <Color x:Key="AuraColor2">#7006B6D4</Color>
         <Color x:Key="AuraColor3">#406366F1</Color>
 
-        <!-- Clean Modern ContextMenu (Fixes WPF white gutter bar!) -->
+        <!-- Clean Modern ContextMenu -->
         <Style TargetType="ContextMenu">
             <Setter Property="Background" Value="{DynamicResource CardBgBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
@@ -47,7 +47,7 @@
             </Setter>
         </Style>
 
-        <!-- Clean Modern MenuItem (Zero white gutter!) -->
+        <!-- Clean Modern MenuItem -->
         <Style TargetType="MenuItem">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
@@ -68,7 +68,6 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
-                                <!-- Checkmark Icon for checkable items -->
                                 <Path x:Name="checkMark"
                                       Grid.Column="0"
                                       Width="10" Height="10"
@@ -115,7 +114,7 @@
             </Setter>
         </Style>
 
-        <!-- Modern iOS / Apple Toggle Switch Style for CheckBox -->
+        <!-- Modern Toggle Switch Style for CheckBox -->
         <Style x:Key="ModernToggleSwitchStyle" TargetType="CheckBox">
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
@@ -167,5 +166,202 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- Minimalist Sleek ScrollBar Style (Zero 90s gray arrows) -->
+        <Style TargetType="ScrollBar">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Width" Value="5" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Background="Transparent">
+                            <Track x:Name="PART_Track" IsDirectionReversed="True">
+                                <Track.Thumb>
+                                    <Thumb>
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Border x:Name="thumb"
+                                                        Background="{DynamicResource BorderBrush}"
+                                                        CornerRadius="2.5"
+                                                        Margin="0,2,0,2" />
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="thumb" Property="Background" Value="{DynamicResource AccentBrush}" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- CUSTOM MODERN SLIDER STYLE (Volume Sliders) -->
+        <Style x:Key="ModernSliderStyle" TargetType="Slider">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="IsMoveToPointEnabled" Value="True" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Height" Value="20" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid VerticalAlignment="Center" Background="Transparent">
+                            <!-- Background Empty Track -->
+                            <Border Height="5"
+                                    Background="{DynamicResource TrackBgBrush}"
+                                    BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="0.5"
+                                    CornerRadius="2.5"
+                                    VerticalAlignment="Center" />
+
+                            <!-- Interactive Track with Fill and Thumb -->
+                            <Track x:Name="PART_Track" VerticalAlignment="Center">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static Slider.DecreaseLarge}">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Height="5"
+                                                        Background="{DynamicResource AccentBrush}"
+                                                        CornerRadius="2.5" />
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb x:Name="Thumb">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Grid Width="14" Height="14">
+                                                    <Ellipse x:Name="thumbGlow"
+                                                             Width="14" Height="14"
+                                                             Fill="{DynamicResource AccentBrush}"
+                                                             Opacity="0" />
+                                                    <Ellipse x:Name="thumbCircle"
+                                                             Width="10" Height="10"
+                                                             Fill="#FFFFFF"
+                                                             Stroke="{DynamicResource BorderBrush}"
+                                                             StrokeThickness="0.5" />
+                                                </Grid>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="thumbGlow" Property="Opacity" Value="0.25" />
+                                                        <Setter TargetName="thumbCircle" Property="Width" Value="12" />
+                                                        <Setter TargetName="thumbCircle" Property="Height" Value="12" />
+                                                        <Setter TargetName="thumbCircle" Property="Fill" Value="{DynamicResource AccentBrush}" />
+                                                    </Trigger>
+                                                    <Trigger Property="IsDragging" Value="True">
+                                                        <Setter TargetName="thumbGlow" Property="Opacity" Value="0.4" />
+                                                        <Setter TargetName="thumbCircle" Property="Fill" Value="{DynamicResource AccentBrush}" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static Slider.IncreaseLarge}">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Background="Transparent" />
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- CUSTOM MODERN TIMELINE SLIDER STYLE (Music Seek Bar) -->
+        <Style x:Key="ModernTimelineSliderStyle" TargetType="Slider">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="IsMoveToPointEnabled" Value="True" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Height" Value="16" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid x:Name="sliderGrid" VerticalAlignment="Center" Background="Transparent">
+                            <!-- Background Empty Track -->
+                            <Border x:Name="trackBg"
+                                    Height="3.5"
+                                    Background="{DynamicResource TrackBgBrush}"
+                                    BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="0.5"
+                                    CornerRadius="1.75"
+                                    VerticalAlignment="Center" />
+
+                            <!-- Interactive Track with Fill and Thumb -->
+                            <Track x:Name="PART_Track" VerticalAlignment="Center">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static Slider.DecreaseLarge}">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border x:Name="fillBorder"
+                                                        Height="3.5"
+                                                        Background="{DynamicResource AccentBrush}"
+                                                        CornerRadius="1.75" />
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb x:Name="Thumb">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Ellipse x:Name="timelineThumb"
+                                                         Width="8" Height="8"
+                                                         Fill="#FFFFFF"
+                                                         Stroke="{DynamicResource BorderBrush}"
+                                                         StrokeThickness="0.5"
+                                                         Opacity="0" />
+                                                <ControlTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding IsMouseOver, ElementName=sliderGrid}" Value="True">
+                                                        <Setter TargetName="timelineThumb" Property="Opacity" Value="1" />
+                                                    </DataTrigger>
+                                                    <Trigger Property="IsDragging" Value="True">
+                                                        <Setter TargetName="timelineThumb" Property="Opacity" Value="1" />
+                                                        <Setter TargetName="timelineThumb" Property="Width" Value="10" />
+                                                        <Setter TargetName="timelineThumb" Property="Height" Value="10" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static Slider.IncreaseLarge}">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Background="Transparent" />
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="trackBg" Property="Height" Value="4.5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Default Slider Style points to ModernSliderStyle -->
+        <Style TargetType="Slider" BasedOn="{StaticResource ModernSliderStyle}" />
+
     </Application.Resources>
 </Application>
